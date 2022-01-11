@@ -1,6 +1,7 @@
 import argparse
 import importlib
 import json
+import pathlib
 import sys
 import traceback
 import typing
@@ -8,12 +9,13 @@ import warnings
 from typing import Any, Dict
 
 import pytkdocs
+import pytkdocs.cli
 
 
 __version__ = "0.0.1"
 
 
-_cachefile = ".all_objects.cache"
+_cachefile = pathlib.Path(".all_objects.cache")
 
 
 def _populate_cache(data: Dict[str, Any], cache: Dict[str, str], path: str):
