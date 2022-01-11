@@ -21,7 +21,9 @@ author = "Patrick Kidger"
 
 author_email = "contact@kidger.site"
 
-description = "Some custom tweaks to the results produced by pytkdocs ""(part of mkdocstrings)."
+description = (
+    "Some custom tweaks to the results produced by pytkdocs (part of mkdocstrings)."
+)
 
 with open(_here / "README.md", "r") as f:
     readme = f.read()
