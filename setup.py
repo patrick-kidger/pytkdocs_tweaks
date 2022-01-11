@@ -6,7 +6,7 @@ import setuptools
 
 _here = pathlib.Path(__file__).resolve().parent
 
-name = "pytkdocs-tweaks"
+name = "pytkdocs_tweaks"
 
 # for simplicity we actually store the version in the __version__ attribute in the
 # source

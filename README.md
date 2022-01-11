@@ -1,4 +1,4 @@
-# pytkdocs-tweaks
+# pytkdocs_tweaks
 
 Some custom tweaks for [pytkdocs](https://github.com/mkdocstrings/pytkdocs).
 
@@ -18,7 +18,7 @@ Note that you must run the `mkdocs` command twice, as these custom tweaks write 
 ## Installation
 
 ```bash
-pip install pytkdocs-tweaks
+pip install pytkdocs_tweaks
 ```
 
 Requires Python 3.8+ and `pytkdocs>=0.15.0`.
