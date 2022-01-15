@@ -12,7 +12,7 @@ import pytkdocs
 import pytkdocs.cli
 
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 
 _cachefile = pathlib.Path(".all_objects.cache")
@@ -55,8 +55,8 @@ def _find_public_bases(bases, cache):
             if base_obj is not None:
                 base_bases = [_obj_to_str(b) for b in base_obj.__bases__]
                 for _base in _find_public_bases(base_bases, cache):
-                    if _base not in out:
-                        out.append(_base)
+                    out.append(_base)
+    out = list(dict.fromkeys(out))  # remove repeats
     return out
 
 
