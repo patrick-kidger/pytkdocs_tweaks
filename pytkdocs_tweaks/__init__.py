@@ -1,5 +1,6 @@
 import argparse
 import importlib
+import inspect
 import json
 import pathlib
 import sys
@@ -12,7 +13,7 @@ import pytkdocs
 import pytkdocs.cli
 
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 
 _cachefile = pathlib.Path(".all_objects.cache")
@@ -141,30 +142,34 @@ def _postprocess(data, cache, bases):
     # Add documentation pointing towards base classes that we inherit methods from, or
     # implement abstractmethods of.
     #
-    if data["docstring"] == "":
-        docstring = ""
-        if "inherited" in data["properties"]:
-            for base in bases:
-                if data["name"] in _str_to_obj(base).__dict__:
-                    docstring = f"Inherited from [`{cache[base]}.{data['name']}`][]."
-                    break
-            else:
-                raise RuntimeError(
-                    f"Inherited object {data['name']} not available on a public base "
-                    "class."
-                )
+    new_docstring = ""
+    if "inherited" in data["properties"]:
+        for base in bases:
+            if data["name"] in _str_to_obj(base).__dict__:
+                new_docstring = f"Inherited from [`{cache[base]}.{data['name']}`][]."
+                break
         else:
-            for base in bases:
-                if data["name"] in _str_to_obj(base).__dict__:
-                    base_method = getattr(_str_to_obj(base), data["name"])
-                    if getattr(base_method, "__isabstractmethod__", False):
-                        docstring = f"Implements [`{cache[base]}.{data['name']}`][]."
+            _base_obj = _str_to_obj(data["path"])
+            _base_path = _base_obj.__module__ + "." + _base_obj.__qualname__
+            _base_config = {"objects": [{"path": _base_path}]}
+            _base_result = pytkdocs.cli.process_config(_base_config)
+            new_docstring = _base_result["objects"][0]["docstring"]
+            data["properties"].remove("inherited")
+    if bases is not None:
+        for base in bases:
+            if data["name"] in _str_to_obj(base).__dict__:
+                base_method = getattr(_str_to_obj(base), data["name"])
+                if getattr(base_method, "__isabstractmethod__", False):
+                    if data["docstring"] == inspect.getdoc(base_method):
+                        new_docstring = (
+                            f"Implements [`{cache[base]}.{data['name']}`][]."
+                        )
                         break
-        if docstring != "":
-            data["docstring_sections"] = [{"type": "markdown", "value": docstring}]
-            # We're modifying docstring_sections, so del docstring as an assertion that
-            # it's not used downstream (and that we're not inconsistent as a result).
-            del data["docstring"]
+    if new_docstring != "":
+        data["docstring_sections"] = [{"type": "markdown", "value": new_docstring}]
+        # We're modifying docstring_sections, so del docstring as an assertion that
+        # it's not used downstream (and that we're not inconsistent as a result).
+        del data["docstring"]
 
     #
     # Don't display "-> None" annotations on __init__ methods.
@@ -223,9 +228,8 @@ def main():
     pytkdocs.cli.process_config = process_config
 
     # By default pytkdocs has some really weird behaviour in which the docstring for
-    # inherited magic methods are removed. This change enhances that check to apply
-    # to all methods, not just magic methods.
-    pytkdocs.loader.RE_SPECIAL = argparse.Namespace(match=lambda x: True)
+    # inherited magic methods are removed. This removes that behaviour.
+    pytkdocs.loader.RE_SPECIAL = argparse.Namespace(match=lambda _: False)
 
     # Set a flag to say we're generating documentation, which the library can use to
     # customise how its types are displayed.
