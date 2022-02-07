@@ -13,7 +13,7 @@ import pytkdocs
 import pytkdocs.cli
 
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 
 
 _cachefile = pathlib.Path(".all_objects.cache")
@@ -157,10 +157,15 @@ def _postprocess(data, cache, bases):
             data["properties"].remove("inherited")
     if bases is not None:
         for base in bases:
-            if data["name"] in _str_to_obj(base).__dict__:
-                base_method = getattr(_str_to_obj(base), data["name"])
+            _base_obj = _str_to_obj(base)
+            if data["name"] in _base_obj.__dict__:
+                base_method = getattr(_base_obj, data["name"])
                 if getattr(base_method, "__isabstractmethod__", False):
-                    if data["docstring"] == inspect.getdoc(base_method):
+                    if (
+                        data["docstring"] == inspect.getdoc(base_method)
+                        or data["docstring"] == ""
+                        or data["docstring"] is None
+                    ):
                         new_docstring = (
                             f"Implements [`{cache[base]}.{data['name']}`][]."
                         )
