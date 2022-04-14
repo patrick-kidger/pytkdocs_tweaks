@@ -12,6 +12,7 @@ _For use as part of the documentation-generation-for-Python stack that comprises
 - Adds an `abstractmethod`/`abstractproperty` property to appear in the documentation instead. (Useful when specifying abstract base classes.)
 - Removed the `dataclass` and `special` properties that appear in the documentation. (I find that these just add visual noise.)
 - Removed the `-> None` return annotation on `__init__` methods.
+- Function-valued defaults now display as just `<function foo>` rather than `<function foo at 0x7f5428d27a60>`.
 
 Note that you must run the `mkdocs` command twice, as these custom tweaks write a cache to disk -- listing all the public objects -- that are then used on the second run. If you see a `.all_objects.cache` file appear -- this is why. (You may wish to add the file to your `.gitignore`.)
 

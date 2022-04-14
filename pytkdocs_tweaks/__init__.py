@@ -11,9 +11,10 @@ from typing import Any, Dict
 
 import pytkdocs
 import pytkdocs.cli
+import pytkdocs.serializer
 
 
-__version__ = "0.0.4"
+__version__ = "0.0.5"
 
 
 _cachefile = pathlib.Path(".all_objects.cache")
@@ -230,7 +231,19 @@ def main():
     if not _cachefile.exists():
         with _cachefile.open("w") as f:
             json.dump({}, f)
+
     pytkdocs.cli.process_config = process_config
+
+    _serialize_signature_parameter = pytkdocs.serializer.serialize_signature_parameter
+
+    def serialize_signature_parameter(parameter):
+        out = _serialize_signature_parameter(parameter)
+        if inspect.isfunction(parameter.default):
+            assert "default" in out
+            out["default"] = f"<function {parameter.default.__name__}>"
+        return out
+
+    pytkdocs.serializer.serialize_signature_parameter = serialize_signature_parameter
 
     # By default pytkdocs has some really weird behaviour in which the docstring for
     # inherited magic methods are removed. This removes that behaviour.
