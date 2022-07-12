@@ -14,7 +14,7 @@ import pytkdocs.cli
 import pytkdocs.serializer
 
 
-__version__ = "0.0.5"
+__version__ = "0.0.6"
 
 
 _cachefile = pathlib.Path(".all_objects.cache")
@@ -145,17 +145,20 @@ def _postprocess(data, cache, bases):
     #
     new_docstring = ""
     if "inherited" in data["properties"]:
+        data["properties"].remove("inherited")
         for base in bases:
             if data["name"] in _str_to_obj(base).__dict__:
                 new_docstring = f"Inherited from [`{cache[base]}.{data['name']}`][]."
                 break
         else:
             _base_obj = _str_to_obj(data["path"])
+            if isinstance(_base_obj, property):
+                # Property objects don't inherit module or qualname
+                _base_obj = _base_obj.fget
             _base_path = _base_obj.__module__ + "." + _base_obj.__qualname__
             _base_config = {"objects": [{"path": _base_path}]}
             _base_result = pytkdocs.cli.process_config(_base_config)
             new_docstring = _base_result["objects"][0]["docstring"]
-            data["properties"].remove("inherited")
     if bases is not None:
         for base in bases:
             _base_obj = _str_to_obj(base)
