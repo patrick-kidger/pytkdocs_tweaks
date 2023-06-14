@@ -3,11 +3,13 @@ repos:
     rev: 22.3.0
     hooks:
     - id: black
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.10.1
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: 'v0.0.255'
     hooks:
-    - id: isort
-  - repo: https://github.com/pycqa/flake8
-    rev: 4.0.1
+      - id: ruff
+        args: ["--fix"]
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.314
     hooks:
-    - id: flake8
+    - id: pyright
+      additional_dependencies: ["pytkdocs==0.15.0"]

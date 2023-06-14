@@ -3,7 +3,6 @@ import importlib
 import inspect
 import json
 import pathlib
-import sys
 import traceback
 import typing
 import warnings
@@ -89,11 +88,17 @@ def _postprocess(data, cache, bases):
                     parameter["annotation"] = parameter["annotation"].replace(
                         p, p.rsplit(".", 1)[1]
                     )
+                parameter["annotation"] = parameter["annotation"].replace(
+                    "collections.abc.", ""
+                )
         if "return_annotation" in signature:
             for p in cache:
                 signature["return_annotation"] = signature["return_annotation"].replace(
                     p, p.rsplit(".", 1)[1]
                 )
+            signature["return_annotation"] = signature["return_annotation"].replace(
+                "collections.abc.", ""
+            )
 
     if "bases" in data:
         # Find those base classes which are part of our public documentation.
@@ -155,6 +160,7 @@ def _postprocess(data, cache, bases):
             if isinstance(_base_obj, property):
                 # Property objects don't inherit module or qualname
                 _base_obj = _base_obj.fget
+            assert _base_obj is not None
             _base_path = _base_obj.__module__ + "." + _base_obj.__qualname__
             _base_config = {"objects": [{"path": _base_path}]}
             _base_result = pytkdocs.cli.process_config(_base_config)
@@ -250,8 +256,10 @@ def main():
 
     # By default pytkdocs has some really weird behaviour in which the docstring for
     # inherited magic methods are removed. This removes that behaviour.
-    pytkdocs.loader.RE_SPECIAL = argparse.Namespace(match=lambda _: False)
+    pytkdocs.loader.RE_SPECIAL = argparse.Namespace(  # pyright: ignore
+        match=lambda _: False
+    )
 
     # Set a flag to say we're generating documentation, which the library can use to
     # customise how its types are displayed.
-    typing.GENERATING_DOCUMENTATION = True
+    typing.GENERATING_DOCUMENTATION = True  # pyright: ignore
