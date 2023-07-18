@@ -13,9 +13,6 @@ import pytkdocs.cli
 import pytkdocs.serializer
 
 
-__version__ = "0.0.6"
-
-
 _cachefile = pathlib.Path(".all_objects.cache")
 
 
