@@ -22,7 +22,7 @@ Note that you must run the `mkdocs` command twice, as these custom tweaks write 
 pip install pytkdocs_tweaks
 ```
 
-Requires Python 3.8+ and `pytkdocs>=0.15.0`.
+Requires Python 3.8+ and `pytkdocs==0.15.0`.
 
 ## Usage
 

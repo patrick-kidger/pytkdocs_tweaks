@@ -1,6 +1,6 @@
 [project]
 name = "pytkdocs_tweaks"
-version = "0.0.7"
+version = "0.0.8"
 description = "Some custom tweaks to the results produced by pytkdocs (part of mkdocstrings)."
 readme = "README.md"
 requires-python ="~=3.8"

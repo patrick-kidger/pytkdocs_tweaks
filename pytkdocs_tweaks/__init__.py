@@ -10,6 +10,7 @@ from typing import Any, Dict
 
 import pytkdocs
 import pytkdocs.cli
+import pytkdocs.loader
 import pytkdocs.serializer
 
 
@@ -256,6 +257,26 @@ def main():
     pytkdocs.loader.RE_SPECIAL = argparse.Namespace(  # pyright: ignore
         match=lambda _: False
     )
+
+    # Remove the unwrapping that is done by default, so that e.g.
+    # ```
+    # @ft.wraps(foo)
+    # def bar(...): ...
+    #
+    # bar.__init__.__doc__ = "..."
+    # ```
+    # works correctly.
+    def __init__(
+        self,
+        obj: Any,
+        name: str,
+        parent: typing.Optional["ObjectNode"] = None,  # pyright: ignore  # noqa: F821
+    ) -> None:
+        self.obj = obj
+        self.name = name
+        self.parent = parent
+
+    pytkdocs.loader.ObjectNode.__init__ = __init__
 
     # Set a flag to say we're generating documentation, which the library can use to
     # customise how its types are displayed.
